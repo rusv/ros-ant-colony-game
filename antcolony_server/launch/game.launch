@@ -1,0 +1,11 @@
+<launch>
+  <!-- Antcolony game server node -->
+  <node name="antcolony_server_node" pkg="antcolony_server" type="antcolony_server_node" output="screen">
+      <param name="blue_ant_image_path" value="$(find antcolony_server)/resources/blue_ant.png"/>
+      <param name="red_ant_image_path" value="$(find antcolony_server)/resources/red_ant.png"/>
+      <param name="blue_hive_image_path" value="$(find antcolony_server)/resources/blue_hive.png"/>
+      <param name="red_hive_image_path" value="$(find antcolony_server)/resources/red_hive.png"/>
+      <param name="white_sugar_image_path" value="$(find antcolony_server)/resources/white_sugar.png"/>
+  </node>
+
+</launch>

@@ -1,0 +1,7 @@
+# Request to play a turn of the game
+Order order
+---
+int8 status
+string error_message
+int8 STATUS_OK=0
+int8 STATUS_ERROR=1
