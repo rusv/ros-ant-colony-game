@@ -3,7 +3,13 @@ This project is a real time strategy game on a ROS1 stack where two client progr
 compete for collecting more sugar for their colony (and they can fight, of cause)
 
 ## Installation
-- To be added
+- `mkdir -p <antcolony_ws>/src`
+- `cd <antcolony_ws>`
+- `catkin_make`
+- `cd src`
+- `git clone https://github.com/rusv/ros-ant-colony-game.git`
+- `cd ..`
+- `catkin_make`
 
 ## How to play
 
