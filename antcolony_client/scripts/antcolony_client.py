@@ -108,6 +108,10 @@ class GameStateFunctions:
             yield ant
 
     def all_sugars(self):
+        """
+        Generates collection of all ants under my control
+        :return:
+        """
         for sugar in self.sugars.values():
             yield sugar
 
@@ -146,7 +150,7 @@ class TaskState:
 
 class BaseTask:
     """
-    A base class for behaviour tree task
+    Base class for behavior tree tasks. Defines base functions.
     """
 
     def __init__(self):
@@ -156,9 +160,15 @@ class BaseTask:
         return self.state != TaskState.RUNNING
 
     def is_valid(self):
+        """
+        :return: True if it makes sense to run task
+        """
         return True
 
     def is_succeeded(self):
+        """
+        :return: True if task succeeded
+        """
         return self.state == TaskState.SUCCEEDED
     
     def set_succeeded(self):
@@ -189,7 +199,7 @@ class BaseTask:
         
 class GameControlTask(BaseTask):
     """
-    A base class for behavior tree task with access to reading current situation and acting on it
+    A base class for behavior tree task with access to reading game state and acting on it
     """
     def __init__(self):
         BaseTask.__init__(self)
@@ -208,7 +218,7 @@ class GameControlTask(BaseTask):
 
 class MoveAntToTargetPointTask(GameControlTask):
     """
-    Until ant exists move to target point
+    Move towards target coordinates
     """
     def __init__(self, ant_id, target_x, target_y):
         GameControlTask.__init__(self)
@@ -217,19 +227,28 @@ class MoveAntToTargetPointTask(GameControlTask):
         self.target_y = target_y
 
     def is_valid(self):
+        """
+        :return: True if ant exists and target is not occupied
+        """
         return self.f.my_ant_exists(self.ant_id) and not self.f.is_occupied(self.target_x, self.target_y)
 
     def is_succeeded(self):
+        """
+        :return: True if ant arrived to target coordinates
+        """
         ant_x, ant_y = self.f.get_ant_coords(self.ant_id)
         return (ant_x == self.target_x) and (ant_y == self.target_y)
 
     def run_impl(self):
+        """
+        Order to move towards target
+        """
         self.c.add_action(self.ant_id, self.target_x, self.target_y, Action.MOVE_ACTION)
         
         
 class AttackTargetAtPointTask(GameControlTask):
     """
-    Until ant exists and adjacent target exists at target coordinates attack it
+    Attack target at adjacent cell
     """
     def __init__(self, ant_id, target_x, target_y, target_id):
         GameControlTask.__init__(self)
@@ -239,22 +258,30 @@ class AttackTargetAtPointTask(GameControlTask):
         self.target_id = target_id
 
     def is_valid(self):
+        """
+        :return: True ant exists and target is at adjacent cell
+        """
         ant_x, ant_y = self.f.get_ant_coords(self.ant_id)
         id_at_target_coords = self.f.get_id_at_coords(self.target_x, self.target_y)
         return self.f.my_ant_exists(self.ant_id) and self.f.is_adjacent(ant_x, ant_y, self.target_x, self.target_y) \
             and id_at_target_coords is not None and id_at_target_coords == self.target_id
 
     def is_succeeded(self):
+        """
+        :return: True if target not exists
+        """
         return not self.f.object_exists(self.target_id)
 
     def run_impl(self):
+        """
+        Order to attack target
+        """
         self.c.add_action(self.ant_id, self.target_x, self.target_y, Action.ATTACK_ACTION)
 
 
 class SucceedAllTask(GameControlTask):
     """
-    Runs a list of tasks sequentially until first failure
-    Succeeds if last tasks succeeded
+    Tries to sequentially succeed all tasks (AND logic)
     """
     def __init__(self, task_list):
         GameControlTask.__init__(self)
@@ -266,12 +293,21 @@ class SucceedAllTask(GameControlTask):
             task.update_state(game_state_functions, game_play_control)
 
     def is_valid(self):
+        """
+        :return: True if none of tasks failed
+        """
         return self.position_index < len(self.task_list) and not self.task_list[self.position_index].has_terminal_state()
 
     def is_succeeded(self):
+        """
+        :return: True if last task succeeded
+        """
         return self.task_list[-1].is_succeeded()
             
     def run_impl(self):
+        """
+        Run task and increment to next if succeeded
+        """
         self.task_list[self.position_index].run()
         if self.task_list[self.position_index].is_succeeded():
             self.position_index += 1
@@ -279,8 +315,7 @@ class SucceedAllTask(GameControlTask):
 
 class SucceedAnyTask(GameControlTask):
     """
-    Runs a list of tasks sequentially until first success
-    Succeeds if any task succeeds
+    Tries to sequentially succeed any of tasks (OR logic)
     """
     def __init__(self, task_list):
         GameControlTask.__init__(self)
@@ -292,15 +327,25 @@ class SucceedAnyTask(GameControlTask):
             task.update_state(game_state_functions, game_play_control)
 
     def is_valid(self):
+        """
+        :return: True if there are tasks to try
+        """
         return self.position_index < len(self.task_list)
 
     def is_succeeded(self):
+        """
+        :return: True if any of tasks succeeded
+        """
         for task in self.task_list:
             if task.is_succeeded():
                 return True
         return False
 
     def run_impl(self):
+        """
+        Run task and increment to next if reached terminal state
+        :return:
+        """
         self.task_list[self.position_index].run()
         if self.task_list[self.position_index].has_terminal_state():
             self.position_index += 1
@@ -332,18 +377,27 @@ class MineSugarTask(GameControlTask):
             self.child_any_task.update_state(game_state_functions, game_play_control)
 
     def is_valid(self):
+        """
+        :return: True if something left to try
+        """
         return not self.child_any_task.has_terminal_state()
         
     def is_succeeded(self):
+        """
+        :return: True if reaching and mining sugar from one of sides had success
+        """
         return self.child_any_task.is_succeeded()
     
     def run_impl(self):
+        """
+        Run child SucceedAnyTask
+        """
         self.child_any_task.run()
         
 
 class QueenTask(GameControlTask):
     """
-    Orders ants to mine sugar
+    Keep ants busy with orders to mine sugar
     """
 
     def __init__(self):
