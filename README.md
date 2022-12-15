@@ -11,7 +11,7 @@ compete for collecting more sugar for their colony (and they can fight, of cause
 - `cd ..`
 - `catkin_make`
 
-## How to play
+## How to launch
 
 You will need several terminals. Ensure you run `source devel/setup.bash` in each of them
 
@@ -25,3 +25,6 @@ In Rviz, add image topic `/antcolony_server_node/game_board_image/image` and you
 a board of the game:
 
 ![Game board](./documentation/sample_board.png)
+
+## Rules of game
+[Rules of game](./documentation/Rules_Of_Game.md)
