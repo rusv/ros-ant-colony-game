@@ -19,12 +19,23 @@ You will need several terminals. Ensure you run `source devel/setup.bash` in eac
 - Start game server: `ANTCOLONY_PLAYER_ONE_TOKEN=SECRET_A ANTCOLONY_PLAYER_TWO_TOKEN=SECRET_B roslaunch antcolony_server game.launch`
 - Start first player: `ANTCOLONY_PLAYER_TOKEN=SECRET_A ANTCOLONY_PLAYER_ID=1 rosrun antcolony_client antcolony_client.py`
 - Start second player: `ANTCOLONY_PLAYER_TOKEN=SECRET_B ANTCOLONY_PLAYER_ID=2 rosrun antcolony_client antcolony_client.py`
-- Start Rviz: `rosrun rviz rviz`
+- There are two ways to visualize the board: using Rviz and using console map viewer 
 
-In Rviz, add image topic `/antcolony_server_node/game_board_image/image` and you should be able to see
-a board of the game:
+### Rviz visualization
 
-![Game board](./documentation/sample_board.png)
+For visualization with Rviz, start it: `rosrun rviz rviz` and add image topic `/antcolony_server_node/game_board_image/image` and you should be able to see
+
+Here is how the board of the game looks in Rviz:
+
+![Game board in Rviz](./documentation/sample_board.png)
+
+### Console map viewer
+
+For visualization with console map viewer: `rosrun antcolony_server console_map_viewer.py`
+
+Here is how the board of the game looks in console map viewer:
+
+![Game board in console map viwer](./documentation/sample_console_board.png)
 
 ## Rules of game
 [Rules of game](./documentation/Rules_Of_Game.md)
